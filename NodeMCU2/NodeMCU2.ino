@@ -19,6 +19,10 @@ DallasTemperature tempSensors(&oneWire);
 int temp_0; // переменная для 1 датчика
 int temp_1; // переменная для 2 датчика
 
+// адреса сенсоров 
+uint8_t sensor1[8] = {0x28, 0x17, 0xBC, 0xBC, 0x33, 0x20, 0x01, 0x88}; 
+uint8_t sensor2[8] = {0x28, 0x2F, 0x39, 0xB9, 0x33, 0x20, 0x01, 0x5C};
+
 // Blynk token
 char auth[] = "lP8CXFCFmjsxNnQ93EBUBUoBlnh9VmP5";
 
@@ -33,7 +37,7 @@ void setup()
   Serial.begin(115200); // Debug console
   Blynk.begin(auth, ssid, pass); // run blynk
   tempSensors.begin(); // run DS18B20 sensors
-  timer.setInterval(2000L, getSendData); // run blynk timer update 2 second
+  timer.setInterval(300000L, getSendData); // run blynk timer update 5 min
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -54,6 +58,7 @@ void setup()
     server.send(200, "text/plain", "Hi! I am ESP8266.");
   });
   
+  
   ElegantOTA.begin(&server);    // Start ElegantOTA
   server.begin();
   Serial.println("HTTP server started");
@@ -69,8 +74,8 @@ void loop()
 void getSendData() 
 {
   tempSensors.requestTemperatures(); 
-  temp_0 = tempSensors.getTempCByIndex(0); // Sensor 0 показания для датчика 1 в цельсиях
-  temp_1 = tempSensors.getTempCByIndex(1); // Sensor 0 показания для датчика 2 в цельсиях 
+  temp_0 = tempSensors.getTempC(sensor1); // Sensor0 показания для датчика 1
+  temp_1 = tempSensors.getTempC(sensor2); // Sensor1 показания для датчика 2 
 
   Serial.print("Temp_0: ");
   Serial.print(temp_0);
