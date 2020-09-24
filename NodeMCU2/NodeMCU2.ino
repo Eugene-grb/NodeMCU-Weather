@@ -2,7 +2,12 @@
 #include <elegantWebpage.h>
 #include <ElegantOTA.h>
 #include <ESP8266WebServer.h>
+#include <WiFiClientSecure.h>
 #include <WiFiClient.h>
+
+// Telegram
+#include <UniversalTelegramBot.h>
+#include <ArduinoJson.h>
 
 // Blynk
 #define BLYNK_PRINT Serial
@@ -26,6 +31,13 @@ uint8_t sensor2[8] = {0x28, 0x2F, 0x39, 0xB9, 0x33, 0x20, 0x01, 0x5C};
 // Blynk token
 char auth[] = "_nOwxvkIMWBc0eil-gk-e6x8Yd5ql91-";
 
+// Telegram token
+#define BOTtoken "1165220013:AAHXjDW18cedIxTiH_VFGuAgsVKl4wehHe0"
+#define CHAT_ID "264783094"
+WiFiClientSecure client;
+UniversalTelegramBot bot(BOTtoken, client);
+
+
 // Your WiFi credentials.
 char ssid[] = "CoffeLink";
 char pass[] = "qqww1122";
@@ -37,6 +49,8 @@ void setup()
   Serial.begin(115200); // Debug console
   Blynk.begin(auth, ssid, pass, IPAddress(188,225,35,45), 8080); // run blynk
   tempSensors.begin(); // run DS18B20 sensors
+  client.setInsecure();
+  bot.sendMessage(CHAT_ID, "Bot started up", "");
   timer.setInterval(3000L, getSendData); // run blynk timer update 5 min
   
   WiFi.mode(WIFI_STA);
