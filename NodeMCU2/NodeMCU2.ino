@@ -24,7 +24,7 @@ uint8_t sensor1[8] = {0x28, 0x17, 0xBC, 0xBC, 0x33, 0x20, 0x01, 0x88};
 uint8_t sensor2[8] = {0x28, 0x2F, 0x39, 0xB9, 0x33, 0x20, 0x01, 0x5C};
 
 // Blynk token
-char auth[] = "lP8CXFCFmjsxNnQ93EBUBUoBlnh9VmP5";
+char auth[] = "_nOwxvkIMWBc0eil-gk-e6x8Yd5ql91-";
 
 // Your WiFi credentials.
 char ssid[] = "CoffeLink";
@@ -35,9 +35,9 @@ ESP8266WebServer server(80);
 void setup()
 {
   Serial.begin(115200); // Debug console
-  Blynk.begin(auth, ssid, pass); // run blynk
+  Blynk.begin(auth, ssid, pass, IPAddress(188,225,35,45), 8080); // run blynk
   tempSensors.begin(); // run DS18B20 sensors
-  timer.setInterval(300000L, getSendData); // run blynk timer update 5 min
+  timer.setInterval(3000L, getSendData); // run blynk timer update 5 min
   
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, pass);
@@ -73,7 +73,7 @@ void loop()
 
 void getSendData() 
 {
-  tempSensors.requestTemperatures(); 
+  tempSensors.requestTemperatures(); // запрос информации с датчиков
   temp_0 = tempSensors.getTempC(sensor1); // Sensor0 показания для датчика 1
   temp_1 = tempSensors.getTempC(sensor2); // Sensor1 показания для датчика 2 
 
@@ -82,7 +82,12 @@ void getSendData()
   Serial.print(" oC . Temp_1: ");
   Serial.print(temp_1);
   Serial.println(" oC");
-   
+
+  // Два поля со значениями
   Blynk.virtualWrite(10, temp_0); //выврд данных на виртуальный пин V10
   Blynk.virtualWrite(11, temp_1); //вывод данных навиртуальный пин V11
+
+  // Таблица со значениями
+  Blynk.virtualWrite(V0, "add", 1, "Температура на улице",temp_0 = tempSensors.getTempC(sensor2));
+  Blynk.virtualWrite(V0, "add", 2, "Температура в зале",temp_0 = tempSensors.getTempC(sensor1));
 }
